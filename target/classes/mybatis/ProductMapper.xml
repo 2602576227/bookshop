@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.feicui.dao.ProductMapper">
+	<insert id="saveProduct" parameterType="com.feicui.model.Products">
+		insert into products 
+		values(#{id},#{name},#{price},#{category},#{pnum},#{imgurl},#{description},#{state},#{cbtime});
+	</insert>
+	<update id="updateProduct" parameterType="com.feicui.model.Products">
+		update products set name = #{name},price = #{price},category = #{category},pnum = #{pnum}
+		<if test="imgurl != null and imgurl !=''">
+			,imgurl = #{imgurl}
+		</if>
+			,description = #{description},state = #{state},state = #{state} where id = #{id}
+	</update>
+	<delete id="delProduct" parameterType="string">
+		delete from products  where id = #{id}
+	</delete>
+	<select id="findProductById" parameterType="string" resultType="com.feicui.model.Products">
+		select * from products where id = #{id}
+	</select>
+	<select id="findProductsList" resultType="com.feicui.model.Products">
+		select * from products
+	</select>
+	
+	<!-- 根据类别查询商品 -->
+	<select id="findProductsListByType" resultType="com.feicui.model.Products">
+		select * from products where category = #{param1} limit #{param2.pageNum},#{param2.pageSize}
+	</select>
+	
+	
+	<!-- 获取商品的总记录数 -->
+	<select id="findCount" resultType="int">
+		select count(*) from products
+	</select>
+	<!-- 根据类别获取商品的总记录数 -->
+	<select id="findCountByType" parameterType="string" resultType="int">
+		select count(*) from products where category = #{type}
+	</select>
+	<!-- 分页查询商品信息  -->
+	<select id="findProductsListPage" parameterType="com.feicui.model.PageBean" resultType="com.feicui.model.Products">
+		select * from products where id in (select product_id from orderitem group by product_id order by  count(*) desc ) union select * from products limit #{pageNum},#{pageSize}
+	</select>
+	
+	<select id="findProductsListPage2" parameterType="map" resultType="com.feicui.model.Products">
+		select p.*  from products p left join t_userlike t on p.id = t.book_id and t.customer_id = #{id} order by rc desc limit #{pageNum},#{pageSize}
+	</select>
+	
+</mapper>
